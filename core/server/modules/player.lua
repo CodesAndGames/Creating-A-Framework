@@ -10,12 +10,12 @@ function player:__construct()
 	Framework.log('player module ready and started.', 'info')
 end
 
-function player:addPlayer(data)
-	if not data or type(data) ~= 'table' then
-		return Framework.log('Unable to add player due to invalid data.', 'error')
+function player:addPlayer(id, data)
+	if not (id or data) or type(data) ~= 'table' then
+		return Framework.log('Unable to add player due to invalid data. '..tostring(id), 'error')
 	end
 
-	id = tostring(source)
+	id = tostring(id)
 
 	if not (data.firstname or data.lastname) then -- mandatory data for player
 		return Framework.log('Player is missing their first and last name!', 'error')
@@ -55,7 +55,7 @@ end
 
 function player:removePlayer(id, reason)
 	id = tostring(id)
-	if id and self.players[id] then
+	if self.players[id] then
 		local success = self:save(id)
 		if success then
 			self.players[id] = nil
@@ -65,14 +65,30 @@ function player:removePlayer(id, reason)
 end
 
 function player:save(id)
+	local identifer = GetPlayerIdentifierByType(id, 'fivem')
 	id = tostring(id)
-	if id and self.players[id] then
+	if self.players[id] then
 		Framework.log('Saving player(s)...','info')
 
 		-- Save to database
-
-		Framework.log('Player '..id..' saved successfully', 'info')
-		return true
+		local isInDb = Framework:execute('SelectPlayer', {
+			['@identifier'] = identifer
+		})
+		if isInDb[1] then
+			local isSave = Framework:execute('SavePlayer', {
+				['cData'] = json.encode(self.players[id]),
+				['identifier'] = identifer
+			})
+			if isSaved then
+				Framework.log('Player '..id..' saved successfully', 'info')
+				return true
+			end
+		else
+			Framework:execute('AddToPlayers', {
+				['@identifier'] = identifer,
+				['cData'] = json.encode(self.players[id])
+			})
+		end
 	end
 	return false
 end
@@ -80,7 +96,7 @@ end
 
 function player:getPlayer(id)
 	id = tostring(id)
-	if id and self.players[id] then
+	if self.players[id] then
 		return self.players[id]
 	end
 end

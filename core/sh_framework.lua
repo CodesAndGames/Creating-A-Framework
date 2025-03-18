@@ -28,7 +28,7 @@ function Framework:RegisterModule(name, tbl)
 	end
 end
 
-function Framework:query(name, query, data)
+function Framework:query(name, query)
 	if not (name or query) then
 		return error('unable to create query due to invalid data passed.')
 	end
@@ -36,18 +36,16 @@ function Framework:query(name, query, data)
 	if not self.queries[name] then
 		self.queries[name] = {
 			query = query,
-			data = data
 		}
 	end
 end
 
-function Framework:execute(name)
+function Framework:execute(name, data)
 	if not (name or self.queries[name]) then
 		return error('unable to execute query. Does it exist?')
 	end
 
 	local query = self.queries[name].query
-	local data = self.queries[name].data
 	local result
 
 	if data then
