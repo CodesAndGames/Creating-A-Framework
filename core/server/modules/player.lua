@@ -65,19 +65,19 @@ function player:removePlayer(id, reason)
 end
 
 function player:save(id)
-	local identifer = GetPlayerIdentifierByType(id, 'fivem')
+	local identifier = GetPlayerIdentifierByType(id, 'fivem')
 	id = tostring(id)
 	if self.players[id] then
 		Framework.log('Saving player(s)...','info')
 
 		-- Save to database
 		local isInDb = Framework:execute('SelectPlayer', {
-			['@identifier'] = identifer
+			['@identifier'] = identifier
 		})
 		if isInDb[1] then
 			local isSave = Framework:execute('SavePlayer', {
 				['cData'] = json.encode(self.players[id]),
-				['identifier'] = identifer
+				['identifier'] = identifier
 			})
 			if isSaved then
 				Framework.log('Player '..id..' saved successfully', 'info')
@@ -85,7 +85,7 @@ function player:save(id)
 			end
 		else
 			Framework:execute('AddToPlayers', {
-				['@identifier'] = identifer,
+				['@identifier'] = identifier,
 				['cData'] = json.encode(self.players[id])
 			})
 		end
@@ -98,6 +98,47 @@ function player:getPlayer(id)
 	id = tostring(id)
 	if self.players[id] then
 		return self.players[id]
+	end
+end
+
+function player:addMoney(id, amount, account) -- self:addMoney(1, 500, 'cash')
+	if not (id or amount or account) or type(amount) ~= 'number' then
+		return Framework.log('Cannot add money. Invalid parameters.', 'error')
+	end
+
+	id = tostring(id)
+	if self.players[id] then
+		if account == 'cash' then
+			self.players[id].bank.cash = self.players[id].bank.cash + amount
+		elseif account == 'checking' then
+			self.players[id].bank.checking.balance = self.players[id].bank.checking.balance + amount
+		elseif account == 'savings' then
+			self.players[id].bank.savings.balance = self.players[id].bank.savings.balance + amount
+		else
+			Framework.log('Cannot add moeny. Invalid account type.', 'error')
+		end
+		return
+	end
+end
+
+
+function player:removeMoney(id, amount, account) -- self:removeMoney(1, 500, 'cash')
+	if not (id or amount or account) or type(amount) ~= 'number' then
+		return Framework.log('Cannot add money. Invalid parameters.', 'error')
+	end
+
+	id = tostring(id)
+	if self.players[id] then
+		if account == 'cash' then
+			self.players[id].bank.cash = self.players[id].bank.cash - amount
+		elseif account == 'checking' then
+			self.players[id].bank.checking.balance = self.players[id].bank.checking.balance - amount
+		elseif account == 'savings' then
+			self.players[id].bank.savings.balance = self.players[id].bank.savings.balance - amount
+		else
+			Framework.log('Cannot add moeny. Invalid account type.', 'error')
+		end
+		return
 	end
 end
 

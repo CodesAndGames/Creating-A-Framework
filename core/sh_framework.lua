@@ -1,5 +1,6 @@
 Framework = class('Framework')
 Framework.modules = {}
+
 function Framework:__construct()
 	print('Framework has started.')
 	self.queries = {}
