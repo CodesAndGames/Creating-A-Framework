@@ -1,8 +1,8 @@
 <script>
 	import BalanceBox from "./BalanceBox.svelte";
-	export let playerName = "John Doe";
-	export let playerid = 1;
-	export let job = "unemployed";
+	export let playerName = "";
+	export let playerid = 0;
+	export let job = "";
 	export let cash = 0;
 	export let bank = 0;
 	export let blackmoney = 0;
@@ -17,8 +17,8 @@
 			<div class="discord-container">{discordLink}</div>
 			<div class="server-info">
 				{serverName}
-				<img src="logo.png" alt="logo" class="server-logo" />
 			</div>
+			<img src="logo.png" alt="logo" class="server-logo" />
 		</div>
 		<div class="online-status">{onlinePlayers} Online</div>
 	</div>
@@ -58,8 +58,9 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		background: rgba(50, 50, 50, 0.5);
-		border-radius: 8px; /* border-radius: 5px; */
+		border-radius: 8px;
 	}
 
 	.top-content {

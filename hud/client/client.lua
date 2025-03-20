@@ -6,12 +6,13 @@ exports('updatehud', function(data)
 end)
 
 
-RegisterCommand('updatehud', function(source)
+RegisterCommand("updatehud", function(source)
 	exports['hud']:updatehud({
-		cash = 1,
-		bank = 1,
-		blackmoney = 1,
-		playerName = 'John Doe',
-		playerid = 1
+		playerName = "john doeghnut",
+		playerid = 1,
+		cash=1,
+		bank=1,
+		blackmoney=1,
+		job='trash collector',
 	})
 end)

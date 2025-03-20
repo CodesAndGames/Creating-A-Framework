@@ -3,7 +3,7 @@ local config = module('config')
 AddEventHandler('playerSpawned', function()
 	print('you have spawned.')
 	TriggerServerEvent('Framework:onSpawn')
-	Wait(1000)
+	Wait(1500)
 
 	if not config.enableHud then
 		return
@@ -11,16 +11,17 @@ AddEventHandler('playerSpawned', function()
 	TriggerServerEvent('updatehud')
 end)
 
-RegisterNetEvent('updateclienthud', function(playerdata)
+RegisterNetEvent('updateclienthud', function(playerdata, playerid)
 	print(json.encode(playerdata))
 	local bankaccount = playerdata.bank
-	local playername = playerdata.firstname.." "..playerdata.lastname
+	local name = playerdata.firstname..' '..playerdata.lastname
 
 	exports['hud']:updatehud({
-		playerName = playername,
-		blackmoney = 0,
+		playerName = name,
 		cash = bankaccount.cash,
 		bank = bankaccount.checking.balance,
-		job = 'Trash Collector'
+		blackmoney = 0,
+		job = 'unemployed',
+		playerid=playerid
 	})
 end)

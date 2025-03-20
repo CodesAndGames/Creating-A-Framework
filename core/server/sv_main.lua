@@ -52,16 +52,17 @@ RegisterCommand('changeMoney', function(source, args) -- /changeMoney add 500 1 
 	end
 	local player = Framework.modules.player:getPlayer(target)
 	Framework.log('Successfully updated '..account..' to '..json.encode(player.bank), 'info')
-	TriggerClientEvent('updateclienthud', target, player)
+	TriggerClientEvent('updateclienthud', target, player, target)
 end)
+
 
 RegisterNetEvent('updatehud', function()
 	print('updating hud')
 	local src = source
 	local player = Framework.modules.player:getPlayer(src)
 	if player then
-		TriggerClientEvent('updateclienthud', src, player)
+		TriggerClientEvent('updateclienthud', src, player, src)
 	else
-		print('failure updating hud')
+		print('no player.')
 	end
 end)

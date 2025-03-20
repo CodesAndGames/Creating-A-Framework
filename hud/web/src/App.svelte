@@ -6,7 +6,7 @@
 	visibility.set(true);
 
 	let hudData = {
-		playerid: 1,
+		playerid: 0,
 		cash: 0,
 		bank: 0,
 		blackmoney: 0,
@@ -18,7 +18,7 @@
 		window.addEventListener("message", (event) => {
 			if (event.data.action === "updatehud") {
 				const data = event.data[1];
-				hudData = { ...hudData, ...data }; //updates hud with new data.
+				hudData = { ...hudData, ...data };
 			}
 		});
 	});

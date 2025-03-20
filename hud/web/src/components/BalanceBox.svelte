@@ -1,13 +1,14 @@
 <script>
 	export let icon = "";
 	export let amount = 0;
-	export let color = "#ffffff"; //default white
+	export let color = "#ffffff";
 
-	$: styleColor = `color ${color};`; // Reactive statement for styling
+	$: styleColor = `colro ${color};`; // Reactive statement for styling
 </script>
 
 <div class="balance-box" style={styleColor}>
 	<img src={icon} class="icon" alt="icon" />
+	<span class="dollar-sign">$</span>
 	<span>{amount.toLocaleString()}</span>
 </div>
 
