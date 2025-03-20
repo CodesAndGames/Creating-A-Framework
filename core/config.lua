@@ -1,4 +1,6 @@
 return {
+	enableHud = true,
+
 	['defaultData'] = {
 		['age'] = 21,
 		['bank'] = {
