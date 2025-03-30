@@ -23,7 +23,7 @@ local function moveCameraToNextPosition()
 
 			SetCamParams(
 				cam,
-				nextPos.pos.x, nextPos.pos.y, nextPos.pos.zm
+				nextPos.pos.x, nextPos.pos.y, nextPos.pos.z
 				-10.0, 0.0, nextPos.heading,
 				50.0, 8000,
 				0.0, 0.0, 2.0
