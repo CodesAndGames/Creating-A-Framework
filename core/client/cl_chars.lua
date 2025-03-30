@@ -12,7 +12,7 @@ local camThread = nil
 
 local cameraPositions = {
 	{ pos = vector3(-55.4898, -969.9152, 307.1311), heading = 339.8556, point = vector3(49.0955, -702,5053, 294,2001) },
-	{ pos = vector3(49.0955, -702,5053, 294,2001), heading = 339.8556, point = vector3(-55.4898, -969.9152, 307.1311) },
+	{ pos = vector3(49.0955, -702.5053, 294,2001), heading = 339.8556, point = vector3(-55.4898, -969.9152, 307.1311) },
 }
 
 local function moveCameraToNextPosition()
