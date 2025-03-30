@@ -85,7 +85,7 @@ RegisterNetEvent('spawnMenu', function()
 
 	local startpos = {camPos.x, camPos.y, camPos.z}
 	local endpos = {camRot.x, camRot.y, camRot.z}
-	SmoothCameraTransition(startPos, startRot, startPos, startRot, 1000)
+	SmoothCameraTransition(startPos, startPos, startPos, startPos, 1000)
 	SendNUIMessage({
 		action = 'spawnMenu',
 		spawns = config.spawnLocations
