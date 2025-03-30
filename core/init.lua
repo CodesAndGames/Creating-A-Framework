@@ -1,4 +1,4 @@
-function class(name)
+function class(name) -- reverted class function to its original.
 	local cls = {}
 	cls.__index = cls
 
@@ -16,39 +16,45 @@ function class(name)
 end
 
 
+
 SERVER = IsDuplicityVersion()
 CLIENT = not SERVER
 
 local modules = {}
 
 function module(resource, path)
-	if not path then
-		path = resource
-		resource = GetCurrentResourceName()--'core' -- or GetCurrentResourceName()
-	end
-	local key = resource..'/'..path
-	local rets = modules[key]
-	if rets then
-		return table.unpack(retsl, 2, rets.n)
-	else
-		local code = LoadResourceFile(resource, path..'.lua')
-		if code then
-			local f, err = load(code, resource..'/'..path..'.lua')
-			if f then
-				local rets = table.pack(xpcall(f, debug.traceback))
-				if rets[1] then
-					modules[key] = rets
-					return table.unpack(rets,2,rets.n)
-				else
-					error('error loading module '..resource..'/'..path..':'..rets[2])
-				end
-			else
-				error('error parsing module '..resource..'/'..path..':'..err)
-			end
-		else
-			error('resource file '..resource..'/'..path..'.lua not found.')
-		end
-	end
+  if not path then
+    path = resource
+    resource = GetCurrentResourceName()
+  end
+
+  local key = resource .. '/' .. path
+  local cached = modules[key]
+
+  if cached then
+    return table.unpack(cached.rets or {}, 1, cached.n or 0)
+  else
+    local code = LoadResourceFile(resource, path .. '.lua')
+    if not code then
+      error('resource file ' .. resource .. '/' .. path .. '.lua not found.')
+    end
+
+    local f, err = load(code, resource .. '/' .. path .. '.lua')
+    if not f then
+      error('error parsing module ' .. resource .. '/' .. path .. ':' .. err)
+    end
+
+    local success, result = xpcall(f, debug.traceback)
+    if not success then
+      error('error loading module ' .. resource .. '/' .. path .. ':' .. result)
+    end
+
+    local rets = { result }
+    modules[key] = { rets = rets, n = #rets }
+
+    return table.unpack(rets)
+  end
 end
+
 
 

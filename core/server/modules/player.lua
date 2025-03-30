@@ -1,3 +1,4 @@
+local Framework = module('sh_framework')
 local player = class('player')
 
 function player:__construct()
@@ -10,27 +11,25 @@ function player:__construct()
 end
 
 function player:addPlayer(id, data)
-	if not (id or data) or type(data) ~= 'table' then
-		return Framework.log('Unable to create character due to invalid data. '..tostring(id), 'error')
+	if not (id or slot or data) then
+		return error('invalid data to create character.')
 	end
-
 	id = tostring(id)
 	local char_id = data.character_id
-	print('adding player for id', id, char_id)
+	print('adding player for id', id)
 
 	if not (data.firstname or data.lastname) then -- mandatory data for player
 		return Framework.log('Player is missing their first and last name!', 'error')
 	end
-
-
+	
 	local function applyDefaults(defaults, target)
 		for key, defaultValue in pairs(defaults) do 
-			if type(defaultData) == "table" then
+			if type(defaultValue) == "table" then
 				target[key] = type(target[key]) == 'table' and target[key] or {}
 				applyDefaults(defaultValue, target[key])
 			else
 				if target[key] == nil or type(target[key]) ~= type(defaultValue) then
-					if key == 'accoutnt' then
+					if key == 'account' then
 						target[key] = math.random(1000,9999)..'-'..math.random(1000, 9999)
 					else
 						target[key] = defaultValue
@@ -39,37 +38,35 @@ function player:addPlayer(id, data)
 			end
 		end
 	end
-
 	applyDefaults(self.config.defaultData, data)
-
+	
 	if not data.gender or type(data.gender) ~= 'string' then
 		data.gender = 'unknown'
 	end
-
+	
 	self.characters[id] = self.characters[id] or {}
 	self.characters[id][char_id] = data
-
-	local identifier = GetPlayerIdentifierByType(id, 'fivem')
+	
+	local identifier = GetPlayerIdentifierByType(id,'fivem')
 	local params = {
 		['@identifier'] = identifier,
-		['@cData'] = json.encode(self.characters[id])
+		['@cData'] = json.encode(self.characters[id]),
 	}
-
 	local isInDb = Framework:execute('SelectPlayer', {['@identifier'] = identifier})
-	if not isInDb[1] then
+	if not isInDb[1] then 
 		local isAdded = Framework:execute('AddToPlayers', params)
 		if isAdded.affectedRows > 0 then
-			print('add to players was successful')
+			print('yes')
 			return 'success'
 		else
-			print('add to players was NOT successful.')
+			print('mo')
 		end
 	end
 	local result = Framework:execute('SavePlayer', params)
 	if result.affectedRows > 0 then
 		return 'success'
 	else
-		error('could not create character.')
+		error('Could not create character.')
 		return false
 	end
 end
@@ -85,22 +82,19 @@ function player:removePlayer(id, reason)
 	end
 end
 
-
 function player:select(id, char_id)
-	id = tostring(id)
-	if self.characters[id] then
-		if self.characters[id][char_id] then
-			self.cData[id] = self.characters[id][char_id]
-			return 'ok'
-		else
-			print('char_id not found: '..char_id)
-		end
-	else
-		print('no characters found for id ', id, char_id)
-	end
+  id = tostring(id)
+  if self.characters[id] then
+    if self.characters[id][char_id] then
+      self.cData[id] = self.characters[id][char_id]
+      return 'ok'
+    else
+      print("[SELECT] char_id NOT found:", char_id)
+    end
+  else
+    print("[SELECT] No characters found for ID:", id, char_id)
+  end
 end
-
-
 
 
 function player:save(id)
@@ -109,22 +103,23 @@ function player:save(id)
 	if self.cData[id] then
 		Framework.log('Saving player(s)...','info')
 		local char_id = self.cData[id].character_id
+		self.characters[id][char_id] = self.cData[id]
 
 		-- Save to database
 		local isInDb = Framework:execute('SelectPlayer', {
-			['@identifier'] = identifier
+			['@identifier'] = identifier,
 		})
 		if isInDb[1] then
-			local isSave = Framework:execute('SavePlayer', {
-				['cData'] = json.encode(self.characters[id]),
-				['identifier'] = identifier
+			local isSaved = Framework:execute('SavePlayer', {
+				['@identifier'] = identifier,
+				['cData'] = json.encode(self.characters[id])
 			})
 			if isSaved then
 				Framework.log('Player '..id..' saved successfully', 'info')
 				return true
 			end
 		else
-			Framework.log('Unable to save '..id..'\'s character. Not in db')
+			Framework.log('Unable to save '..id..'\'s character. Invalid data.')
 		end
 	end
 	return false
@@ -158,7 +153,6 @@ function player:addMoney(id, amount, account) -- self:addMoney(1, 500, 'cash')
 	end
 end
 
-
 function player:removeMoney(id, amount, account) -- self:removeMoney(1, 500, 'cash')
 	if not (id or amount or account) or type(amount) ~= 'number' then
 		return Framework.log('Cannot add money. Invalid parameters.', 'error')
@@ -179,6 +173,7 @@ function player:removeMoney(id, amount, account) -- self:removeMoney(1, 500, 'ca
 	end
 end
 
+
 function player:getAllCharacters(id)
 	id = tostring(id)
 
@@ -190,37 +185,40 @@ function player:getAllCharacters(id)
 	local result = Framework:execute('SelectPlayer', {['@identifier'] = identifier})
 	if result[1] and result[1].cData then
 		local decoded = json.decode(result[1].cData)
-		if decoded = then
+		if decoded then
 			self.characters[id] = decoded
-			print(json.encode(decoded))
+			print('slot based data log: '..json.encode(decoded, {indent=true}))  -- logs your slot-based data
 			return decoded
 		else
-			Framework.log('Couldn to decode cData for player: '..identifier, 'error')
+			Framework.log('Could not decode cData for player: '..identifier, 'error')
 		end
+	else
+		print('no resut[1] or result[1].cData'..json.encode(result[1]))
 	end
 end
 
-function player:getCharactersForUI(id)
-	id = tostring(id)
-
-	local characters = self.characters[id]
-	local formatted = {}
+function player:getCharactersForUI(id) -- this is only called when the player joins/spawns in the server
+  id = tostring(id)
+  local characters = self:getAllCharacters(id)
+  local formatted = {}
 
 	for key, char in pairs(characters or {}) do
-		local slot = tonumber(key:match("^(%d+)%-%w+")) -- extracts the slot number (1,2 or 3)
-		if slot then
-			formatted[#formatted + 1] = {
-				slot = slot,
-				firstname = char.firstname,
-				lastname = char.lastname, 
-				age = char.age,
-				-- gender = char.gender,
-				-- character_id = char.character_id
-				-- add more data to display in UI
-			}
-		end
-	end
-	return formatted
+    local slot = tonumber(key:match("^(%d+)%-%w+")) -- extract slot number (1, 2, 3)
+    if slot then
+      formatted[#formatted + 1] = {
+        slot = slot,
+        firstname = char.firstname,
+        lastname = char.lastname,
+        age = char.age,
+        gender = char.gender,
+        character_id = char.character_id,
+        -- add other fields you want to display in NUI
+      }
+    end
+  end
+
+  return formatted
 end
 
-Framework:RegisterModule('player', player)
+
+Framework:RegisterModule('Player', player)
