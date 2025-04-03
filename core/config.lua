@@ -20,9 +20,9 @@ return {
 	spawnLocations = {
 		['Harmony'] = {
 			id = 'harmony',
-			coords = {337.1813, -289.9784, 99.5026},
-			rotation = {-90.0, 0.0, 0.0},
-			spawnCoords = {323.4967, -230.0344, 54.1085},
+			coords = {337.1813, -289.9784, 99.5026}, -- camera coords
+			rotation = {-90.0, 0.0, 0.0}, -- cam rotation
+			spawnCoords = {323.4967, -230.0344, 54.1085}, -- player spawn coords
 		},
 		['LS Airport'] = {
 			id= 'lsairport',

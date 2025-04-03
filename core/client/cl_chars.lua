@@ -1,17 +1,21 @@
 local config = module('config')
 local Framework = module('sh_framework')
-if config.debug then
-	print("[DEBUG] Loaded spawn locations:", json.encode(config.spawnLocations))
-end
-
 local isCreatingCharacter = false
 local cam = nil
 local currentPosIndex = 1
+local startPos = {-647.5715, -865.6418, 438.6137}
+local startRot = {-15.0, 0.0, -60.0}
 -- Define the new camera positions with headings
 local cameraPositions = {
 	{ pos = vector3(-55.4898, -969.9152, 307.1311), heading = 339.8556, point = vector3(49.0955, -702.5053, 294.2001) },
 	{ pos = vector3(49.0955, -702.5053, 294.2001), heading = 340, point = vector3(-55.4898, -969.9152, 307.1311) }
 }
+
+
+if config.debug then
+	print("[DEBUG] Loaded spawn locations:", json.encode(config.spawnLocations))
+end
+
 
 local function moveCameraToNextPosition()
 	if not isCreatingCharacter then return end
@@ -82,18 +86,14 @@ CreateThread(function()
 end)
 
 
-local startPos = {-647.5715, -865.6418, 438.6137}
-local startRot = {-15.0, 0.0, -60.0}
-
-
 RegisterNetEvent('spawnMenu', function()
 	SetNuiFocus(true, true)
 	local camPos = GetCamCoord(cam)
 	local camRot = GetCamRot(cam, 2)
 
 	local startpos = {camPos.x, camPos.y, camPos.z}
-	local endpos = {camRot.x, camRot.y, camRot.z}
-	SmoothCameraTransition(startPos, startRot,startPos, startRot, 1000)
+	local startrot = {camRot.x, camRot.y, camRot.z}
+	SmoothCameraTransition(startpos, startrot, startPos, startRot, 1000)
 	SendNUIMessage({ 
 		action = 'spawnMenu',
 		spawns = config.spawnLocations
@@ -174,7 +174,7 @@ Framework:RegisterCallback('loadCharacters', function(characters)
 	end
 	Citizen.SetTimeout(1000, function()
 		SendNUIMessage({
-			action = 'characters',
+			action = 'loadCharacters',
 			characters = characters
 		})
 		if config.debug then
@@ -182,4 +182,75 @@ Framework:RegisterCallback('loadCharacters', function(characters)
 		end
 	end)
 	return 'ok'
+end)
+
+
+-- [[ Callbacks ]] --
+
+RegisterNUICallback('spawnHere', function(data, cb)
+	if not data or next(data) == nil then
+		print('error: received empty spawn data!', json.encode(data))
+		return
+	end
+
+	if not data.coords or type(data.coords) ~= 'table' then
+		print('error: no valid coords in spawn data')
+		return
+	end
+
+	local x,y,z = table.unpack(data.spawnCoords)
+	local playerPed = PlayerPedId()
+
+	SetEntityCoords(playerPed, x,y,z, false, false, false, true)
+	SetNuiFocus(false, false)
+	ResetCamera()
+	FreezeEntityPosition(playerPed, false)
+	DisplayRadar(true)
+	cb({ success = true })
+end)
+
+RegisterNUICallback('selectLocation', function(data,cb)
+	if config.debug then
+		print('received location name from NUI ', data.location)
+	end
+
+	for name, spawn in pairs(config.spawnLocations) do
+		if config.debug then
+			print('checking ',name, ' against received ', data.location)
+		end
+
+		if data.location == name then
+			SmoothCameraTransition(startPos, startRot, spawn.coords, spawn.rotation, 2000)
+			cb({ success = true})
+			return
+		end
+	end
+
+	error('unable to match location name with data and config')
+	cb({ success = false })
+end)
+
+
+RegisterNUICallback('saveCharacter', function(data, cb)
+	Framework:TriggerCallback('saveCharacter', function(isCreated)
+		if isCreated then
+			cb({ success = true })
+		else
+			cb({success= false})
+		end
+	end, nil, data)
+end)
+
+RegisterNUICallback('selectCharacter', function(data, cb)
+	isCreatingCharacter = false
+	Framework:TriggerCallback('selectCharacter', function(isSelected)
+		if isSelected then
+			print('triggering spawn menu')
+			DestroyCam(cam, false)
+			TriggerEvent('spawnMenu')
+			cb({success = true})
+		else
+			cb({success=false})
+		end
+	end, nil, data)
 end)

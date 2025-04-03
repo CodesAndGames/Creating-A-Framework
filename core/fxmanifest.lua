@@ -1,6 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
+ui_page 'nui/index.html'
+
 server_script '@oxmysql/lib/MySQL.lua'
 server_scripts {
 	'init.lua',
@@ -22,6 +24,8 @@ client_scripts {
 files {
 	'config.lua',
 	'sh_framework.lua',
+	'nui/*',
+	'nui/**/*'
 }
 
 dependency 'oxmysql'
