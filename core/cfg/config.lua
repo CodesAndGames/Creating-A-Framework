@@ -1,5 +1,5 @@
 return {
-	debug = true,
+	debug = false,
 	enableHud = true,
 
 	['defaultData'] = {

@@ -1,5 +1,4 @@
-local config = module('config')
-local Framework = module('sh_framework')
+local config = module('cfg/config')
 local isCreatingCharacter = false
 local cam = nil
 local currentPosIndex = 1
@@ -172,15 +171,14 @@ Framework:RegisterCallback('loadCharacters', function(characters)
 	if config.debug then
 		print("[CLIENT] loadCharacters event received!")
 	end
-	Citizen.SetTimeout(1000, function()
-		SendNUIMessage({
-			action = 'loadCharacters',
-			characters = characters
-		})
-		if config.debug then
-			print("Sent NUI Message after delay") -- Debugging
-		end
-	end)
+	
+	SendNUIMessage({
+		action = 'loadCharacters',
+		characters = characters
+	})
+	if config.debug then
+		print("Sent NUI Message after delay") -- Debugging
+	end
 	return 'ok'
 end)
 

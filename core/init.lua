@@ -1,22 +1,3 @@
-function class(name) -- reverted class function to its original.
-	local cls = {}
-	cls.__index = cls
-
-	setmetatable(cls, {
-		__index = cls,
-		__newindex = function(tbl, key, value)
-			rawset(tbl, key, value)
-			if key == "__construct" then
-				value(tbl)
-			end
-		end
-	})
-
-	return cls
-end
-
-
-
 SERVER = IsDuplicityVersion()
 CLIENT = not SERVER
 
@@ -58,3 +39,33 @@ end
 
 
 
+local function wait(self)
+	local r = Citizen.Await(self.p)
+	if not (r and self.r) then
+		r = self.r 
+	elseif not r then
+		error('Wait() failed: await resolved with nil and no areturn fallback value')
+	end
+	return table.unpack(r, 1, r.n)
+end
+
+local function areturn(self, ...)
+	if not self._resolved then
+		self.r = table.pack(...)
+		self._resolved = true 
+		self.p:resolve(self.r)
+	end
+end
+
+function async(func)
+	if func then
+		Citizen.CreateThreadNow(func)
+	else
+		return setmetatable({
+			wait = wait,
+			p = promise.new(),
+			r = nil,
+			_resolved = false
+		}, { __call = areturn })
+	end
+end

@@ -1,29 +1,24 @@
 fx_version 'cerulean'
 game 'gta5'
-
 ui_page 'nui/index.html'
 
+shared_script 'init.lua'
 server_script '@oxmysql/lib/MySQL.lua'
 server_scripts {
-	'init.lua',
-	'sh_framework.lua',
-	-- Load all modules below here.
-	'server/modules/player.lua',
-	-- Load main.lua last so it loads all modules before it.
-	'server/sv_main.lua',
-	'server/sv_chars.lua',
+	'modules/base.lua',
+	'modules/characters.lua',
 }
 
 client_scripts {
-	'init.lua',
-	'sh_framework.lua',
-	'client/cl_main.lua',
-	'client/cl_chars.lua',
+	'client/base.lua',
+	'client/characters.lua',
 }
 
 files {
-	'config.lua',
-	'sh_framework.lua',
+	'bridge/*.lua',
+	'shared.lua',
+	'main.lua',
+	'cfg/config.lua',
 	'nui/*',
 	'nui/**/*'
 }
