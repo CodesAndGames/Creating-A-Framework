@@ -1,0 +1,28 @@
+// The .container class is used to center its child elements both horizontally and vertically
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 92vh;
+	max-height: 250vh;
+}
+
+.menu {
+	list-style: none;
+	padding: 0;
+	width: 200px;
+	border: 1px solid #000000;
+	outline: none;
+
+	&__item {
+		padding:10px 16px;
+		transition: background 0.2s;
+		color:black;
+		background: white;
+	}
+
+	&__item--selected {
+		background: #00b79c;
+		color: #fff;
+	}
+}
