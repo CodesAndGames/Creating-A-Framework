@@ -9,8 +9,6 @@ const App: React.FC = () => {
 
 	useNuiEvent('openMenu', (data: any) => {
 		const menuData = data.data;
-		console.log(JSON.stringify(menuData));
-
 		setMenuKey(menuData.menuKey);
 		setMenus(menuData.menus);
 		setVisible(true);

@@ -14,7 +14,7 @@ function openMenu(key)
 end
 
 RegisterCommand("showMenu", function() openMenu("main") end, false)
-
+RegisterKeyMapping('showMenu',"Open menu",  "Keyboard", "G")
 -- handle back
 RegisterNUICallback("selectMenuItem", function(data, cb)
   if data.menu then
@@ -32,7 +32,22 @@ RegisterNUICallback("selectMenuItem", function(data, cb)
     else
       TriggerEvent(data.eventName, table.unpack(data.args or {}))
     end
-  end
+	elseif data.export then
+    local res = data.resource or GetCurrentResourceName()
+    local args = data.args or {}
+
+    if data.exportServer then
+      -- forward to server to invoke its export
+      TriggerServerEvent('jaxmenu:callExport', res, data.export, table.unpack(args))
+    else
+      -- call client export directly
+      if exports[res] and exports[res][data.export] then
+        exports[res][data.export](table.unpack(args))
+      else
+        print(("menu: missing client export %s in resource %s"):format(data.export, res))
+      end
+    end
+	end
 
   cb("ok")
 end)
@@ -42,3 +57,6 @@ RegisterNUICallback('close', function(_,cb)
 	SetNuiFocus(false, false)
 	SendNUIMessage({type='close'})
 end)
+
+
+exports('openMenu', openMenu)

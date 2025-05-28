@@ -6,14 +6,9 @@ client_scripts {
 	'client/menu_config.lua',
 	'client/client.lua'
 }
+server_script 'server/server.lua'
 
 files {
 	'build/*',
 	'build/**/*'
-}
-
-exports {
-	'GetMenu',
-	'openMenu',
-	'RegisterMenu'
 }
