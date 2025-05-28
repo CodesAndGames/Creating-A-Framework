@@ -5,8 +5,9 @@ import { fetchNui } from '@utilities/utils';
 
 export interface MenuItem {
 	label: string;
-	eventName: string;
-	isServer: boolean;
+	menu?: string;
+	eventName?: string;
+	isServer?: boolean;
 	args?: any[];
 }
 
@@ -60,9 +61,9 @@ const Menu: React.FC<MenuProps> = ({ items = [], menuKey = 'main' }) => {
 
 	const handleSelect = () => {
 		const item = displayItems[selectedIndex];
-		if (!item) return;
-		const { eventName, isServer, args = [] } = item;
-		fetchNui('selectMenuItem', { eventName, isServer, args });
+		if (!item) return console.error('no item');
+		const { menu, eventName, isServer, args = [] } = item;
+		fetchNui('selectMenuItem', { menu, eventName, isServer, args });
 	};
 
 

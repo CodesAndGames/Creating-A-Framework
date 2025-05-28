@@ -1,0 +1,27 @@
+{
+	"files.exclude": {
+		"**/package.json": true,
+		"**/package-lock.json": true,
+		"**/yarn.lock": true,
+		"**/yarn-error.log": true,
+		"**/.yarn.installed": true,
+		"**/node_modules": true,
+		"**/.gitattributes":true,
+		"**/.gitignore":true,
+		"**/tsconfig.json":true,
+		"**/.env":true,
+		"**/index.html":true,
+		"**/vite.config.ts":true,
+		"**/index.css":true,
+		"**/index.tsx":true,
+		"**/vite-env.d.ts":true,
+
+		"**/main.ts":true,
+		"**/pnpm-lock.yaml":true,
+		"**/tsconfig.node.json":true,
+		"**/svelte.config.js":true,
+		"**/utils/":true,
+		"**/store/":true,
+		"**/providers/":true,
+	}
+}
